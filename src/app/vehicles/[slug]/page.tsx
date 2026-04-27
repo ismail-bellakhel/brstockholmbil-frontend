@@ -123,7 +123,7 @@ export default async function VehicleDetailPage({ params }: Props) {
                 className="object-cover"
                 priority
                 sizes="(max-width: 1024px) 100vw, 58vw"
-                unoptimized={vehicle.hero_image.url.startsWith('data:')}
+                unoptimized={vehicle.hero_image?.url?.startsWith('data:') ?? false}
               />
               {vehicle.status !== 'available' && (
                 <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center">
