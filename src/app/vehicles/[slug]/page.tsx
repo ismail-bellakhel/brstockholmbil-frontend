@@ -6,7 +6,7 @@ import { getVehicleBySlug, getVehicleSlugs, getSiteSettings, getVehicles } from 
 import { buildVehicleMetadata, vehicleJsonLd, formatPrice, formatMileage } from '@/lib/utils/metadata'
 import { VehicleCard } from '@/components/vehicles/VehicleCard'
 
-export const revalidate = 300
+export const dynamic = "force-dynamic"
 
 interface Props {
   params: Promise<{ slug: string }>
