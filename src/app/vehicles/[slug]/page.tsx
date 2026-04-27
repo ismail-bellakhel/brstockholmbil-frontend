@@ -117,7 +117,7 @@ export default async function VehicleDetailPage({ params }: Props) {
             {/* Hero image */}
             <div className="relative aspect-[16/10] bg-stone-100 overflow-hidden mb-3">
               <Image
-                src={vehicle.hero_image?.sizes?.large ?? vehicle.hero_image?.url ?? "/placeholder.jpg"}
+                src={vehicle.hero_image?.url ?? "/placeholder.jpg"}
                 alt={`${specs.brand} ${specs.model} ${specs.year}`}
                 fill
                 className="object-cover"
