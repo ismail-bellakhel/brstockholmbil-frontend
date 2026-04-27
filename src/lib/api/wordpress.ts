@@ -132,7 +132,7 @@ function mapVehicle(raw: any): Vehicle {
     short_description: acf.short_description ?? '',
     full_description: acf.full_description ?? '',
     hero_image: normaliseImage(acf.hero_image) as WPImage,
-    gallery_images: (acf.gallery_images ?? [])
+    gallery_images: (acf.gallery ?? [])
       .map((img: Record<string, unknown>) => normaliseImage(img))
       .filter(Boolean),
     blocket_url: acf.blocket_url || null,
