@@ -26,15 +26,15 @@ export default async function HomePage() {
     <section className="relative min-h-[80vh] flex items-end bg-stone-900">
       <div className="absolute inset-0">
   <img
-    src="/hero/hero-1.jpg"
+    src="/hero-1.jpg"
     className="absolute inset-0 w-full h-full object-cover opacity-60 animate-fade"
   />
   <img
-    src="/hero/hero-2.jpg"
+    src="/hero-2.jpg"
     className="absolute inset-0 w-full h-full object-cover opacity-0 animate-fade delay-5"
   />
   <img
-    src="/hero/hero-3.jpg"
+    src="/hero-3.jpg"
     className="absolute inset-0 w-full h-full object-cover opacity-0 animate-fade delay-10"
   />
 </div>
