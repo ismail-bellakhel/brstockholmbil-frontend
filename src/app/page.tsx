@@ -96,10 +96,12 @@ export default async function HomePage() {
 
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {collectorVehicles.slice(0, 3).map((vehicle) => (
-                <VehicleCard key={vehicle.id} vehicle={vehicle} />
-              ))}
-              <div className="mt-14 flex justify-center">
+  {collectorVehicles.slice(0, 3).map((vehicle) => (
+    <VehicleCard key={vehicle.id} vehicle={vehicle} />
+  ))}
+</div>
+
+<div className="mt-14 flex justify-center">
   <Link
     href="/collector"
     className="inline-block border border-white text-white px-6 py-3 text-sm tracking-wide hover:bg-white hover:text-black transition-colors duration-200"
@@ -107,7 +109,7 @@ export default async function HomePage() {
     Se alla premiumbilar
   </Link>
 </div>
-            </div>
+
           </div>
         </section>
       )}
