@@ -24,7 +24,7 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
   <img
     src="/logo.png"
     alt="BR Stockholmbil"
-    className="h-8 w-auto"
+    className="h-12 w-auto"
   />
 </Link>
 
