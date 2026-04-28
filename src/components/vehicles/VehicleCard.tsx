@@ -83,17 +83,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
               Visa bil
             </span>
           )}
-          {blocket_url && (
-            <a
-              href={blocket_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            
-              className="flex-1 text-center text-xs tracking-wide border border-stone-300 px-3 py-2 text-stone-600 hover:border-stone-500 hover:text-stone-900 transition-colors duration-200"
-            >
-              Blocket ↗
-            </a>
-          )}
+        <div></div>
         </div>
       </div>
     </>
