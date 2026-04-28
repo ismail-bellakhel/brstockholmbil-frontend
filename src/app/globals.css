@@ -96,9 +96,26 @@
     font-size: 0.875rem;
     line-height: 1.5;
   }
-
-  html {
-  scroll-behavior: smooth;
 }
 
+@layer utilities {
+  @keyframes hero-fade {
+    0% { opacity: 0; }
+    8% { opacity: 0.6; }
+    30% { opacity: 0.6; }
+    38% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  .animate-fade {
+    animation: hero-fade 15s infinite;
+  }
+
+  .delay-5 {
+    animation-delay: 5s;
+  }
+
+  .delay-10 {
+    animation-delay: 10s;
+  }
 }

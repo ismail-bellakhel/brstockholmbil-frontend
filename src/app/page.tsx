@@ -24,14 +24,20 @@ export default async function HomePage() {
   return (
   <>
     <section className="relative min-h-[80vh] flex items-end bg-stone-900">
-      <Image
-        src="/hero.jpg"
-        alt="BR Stockholm Bil showroom"
-        fill
-        className="object-cover opacity-60"
-        priority
-        sizes="100vw"
-      />
+      <div className="absolute inset-0">
+  <img
+    src="/hero/hero-1.jpg"
+    className="absolute inset-0 w-full h-full object-cover opacity-60 animate-fade"
+  />
+  <img
+    src="/hero/hero-2.jpg"
+    className="absolute inset-0 w-full h-full object-cover opacity-0 animate-fade delay-5"
+  />
+  <img
+    src="/hero/hero-3.jpg"
+    className="absolute inset-0 w-full h-full object-cover opacity-0 animate-fade delay-10"
+  />
+</div>
         
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
