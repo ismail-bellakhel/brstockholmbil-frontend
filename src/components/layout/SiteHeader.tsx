@@ -23,7 +23,7 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
           <Link href="/" className="flex items-center">
   <img
     src="/logo.png"
-    alt="BR Stockholm Bil"
+    alt="BR Stockholmbil"
     className="h-8 w-auto"
   />
 </Link>
