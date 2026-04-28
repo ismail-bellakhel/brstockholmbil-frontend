@@ -389,7 +389,7 @@ export async function getArticles(
   categorySlug?: string
 ): Promise<PaginatedResponse<Article>> {
   const fallback: PaginatedResponse<Article> = {
-    items: MOCK_ARTICLES,
+    items: [],
     total: MOCK_ARTICLES.length,
     page: 1,
     per_page: perPage,
