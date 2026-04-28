@@ -171,7 +171,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {articles.length > 0 && (
+      {false && articles.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-stone-100">
           <div className="flex items-end justify-between mb-10">
             <div>
