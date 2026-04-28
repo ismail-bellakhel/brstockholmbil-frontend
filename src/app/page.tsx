@@ -93,14 +93,20 @@ export default async function HomePage() {
                 <p className="text-[11px] tracking-widest uppercase text-stone-500 mb-2">Premiumbilar</p>
                 <h2 className="text-2xl font-light text-white">Sällsynta och klassiska bilar</h2>
               </div>
-              <Link href="#premium" className="text-sm text-stone-500 hover:text-stone-300 transition-colors">
-                Se Premiumbilar →
-              </Link>
+
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {collectorVehicles.slice(0, 3).map((vehicle) => (
                 <VehicleCard key={vehicle.id} vehicle={vehicle} />
               ))}
+              <div className="mt-14 flex justify-center">
+  <Link
+    href="/collector"
+    className="inline-block border border-white text-white px-6 py-3 text-sm tracking-wide hover:bg-white hover:text-black transition-colors duration-200"
+  >
+    Se alla premiumbilar
+  </Link>
+</div>
             </div>
           </div>
         </section>
