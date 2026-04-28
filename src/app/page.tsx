@@ -22,19 +22,17 @@ export default async function HomePage() {
   ])
 
   return (
-    <>
-      <section className="relative min-h-[80vh] flex items-end bg-stone-900">
-        {settings?.hero_image && (
-          <Image
-            src={settings.hero_image.url}
-            alt="Hero"
-            fill
-            className="object-cover opacity-60"
-            priority
-            sizes="100vw"
-            unoptimized={settings.hero_image.url.startsWith('data:')}
-          />
-        )}
+  <>
+    <section className="relative min-h-[80vh] flex items-end bg-stone-900">
+      <Image
+        src="/hero.jpg"
+        alt="BR Stockholm Bil showroom"
+        fill
+        className="object-cover opacity-60"
+        priority
+        sizes="100vw"
+      />
+        
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
           <div className="max-w-2xl">
