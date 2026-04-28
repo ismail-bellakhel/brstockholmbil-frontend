@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
@@ -6,7 +5,7 @@ import { getVehicleBySlug, getVehicleSlugs, getSiteSettings, getVehicles } from 
 import { buildVehicleMetadata, vehicleJsonLd, formatPrice, formatMileage } from '@/lib/utils/metadata'
 import { VehicleCard } from '@/components/vehicles/VehicleCard'
 
-export const dynamic = "force-dynamic"
+export const dynamic = 'force-dynamic'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -64,7 +63,6 @@ export default async function VehicleDetailPage({ params }: Props) {
 
   if (!vehicle) notFound()
 
-  // Don't render internal page if disabled
   if (!vehicle.show_internal_detail_page && vehicle.blocket_url) {
     return (
       <div className="max-w-xl mx-auto px-4 py-20 text-center">
@@ -81,50 +79,46 @@ export default async function VehicleDetailPage({ params }: Props) {
     )
   }
 
-  // Related vehicles (same brand, exclude current)
   const { items: related } = await getVehicles({ category: vehicle.category }, 1, 4)
   const relatedVehicles = related.filter((v) => v.id !== vehicle.id).slice(0, 3)
 
   const specs = vehicle.specs
   const isCollector = vehicle.category === 'collector'
+  const heroUrl = vehicle.hero_image?.sizes?.large || vehicle.hero_image?.url || ''
 
   return (
     <>
-      {/* JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(vehicleJsonLd(vehicle)) }}
       />
 
       <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
-        {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-stone-400 mb-8" aria-label="Brödsmulor">
           <Link href="/" className="hover:text-stone-700 transition-colors">Hem</Link>
           <span>/</span>
-          <Link
-            href={isCollector ? '/collector' : '/vehicles'}
-            className="hover:text-stone-700 transition-colors"
-          >
-            {isCollector ? 'Samlarsektionen' : 'Bilar till salu'}
+          <Link href={isCollector ? '/collector' : '/vehicles'} className="hover:text-stone-700 transition-colors">
+            {isCollector ? 'Premiumbilar' : 'Bilar till salu'}
           </Link>
           <span>/</span>
           <span className="text-stone-600">{specs.brand} {specs.model}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
-          {/* Left: gallery */}
           <div className="lg:col-span-7">
-            {/* Hero image */}
             <div className="relative aspect-[16/10] bg-stone-100 overflow-hidden mb-3">
-              <Image
-                src={vehicle.hero_image?.url ?? "/placeholder.jpg"}
-                alt={`${specs.brand} ${specs.model} ${specs.year}`}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 1024px) 100vw, 58vw"
-                unoptimized={vehicle.hero_image?.url?.startsWith('data:') ?? false}
-              />
+              {heroUrl ? (
+                <img
+                  src={heroUrl}
+                  alt={`${specs.brand} ${specs.model} ${specs.year}`}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-stone-200 flex items-center justify-center">
+                  <span className="text-stone-400 text-sm">Ingen bild</span>
+                </div>
+              )}
+
               {vehicle.status !== 'available' && (
                 <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center">
                   <span className="bg-white text-stone-900 text-sm tracking-widest uppercase px-6 py-2">
@@ -134,32 +128,37 @@ export default async function VehicleDetailPage({ params }: Props) {
               )}
             </div>
 
-            {/* Gallery thumbnails */}
             {vehicle.gallery_images.length > 0 && (
               <div className="grid grid-cols-5 gap-2">
-                {vehicle.gallery_images.slice(0, 5).map((img, i) => (
-                  <div key={i} className="relative aspect-square bg-stone-100 overflow-hidden">
-                    <Image
-                      src={img.sizes.thumbnail ?? img.url}
-                      alt={`${specs.brand} ${specs.model} — bild ${i + 2}`}
-                      fill
-                      className="object-cover hover:opacity-80 transition-opacity cursor-pointer"
-                      sizes="20vw"
-                      unoptimized={img.url.startsWith('data:')}
-                    />
-                  </div>
-                ))}
+                {vehicle.gallery_images.slice(0, 5).map((img, i) => {
+                  const imageUrl = img.sizes?.thumbnail || img.sizes?.medium || img.url
+
+                  return (
+                    <div key={i} className="relative aspect-square bg-stone-100 overflow-hidden">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={`${specs.brand} ${specs.model} — bild ${i + 2}`}
+                          className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-stone-200 flex items-center justify-center">
+                          <span className="text-stone-400 text-xs">Ingen bild</span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>
 
-          {/* Right: info */}
           <div className="lg:col-span-5">
-            {/* Category + status */}
             <div className="flex items-center gap-3 mb-4">
               {isCollector && (
                 <span className="text-[10px] tracking-widest uppercase bg-stone-900 text-white px-2.5 py-1">
-                  Samlarbil
+                  Premiumbil
                 </span>
               )}
               <span className={`text-[10px] tracking-widest uppercase px-2.5 py-1 border ${
@@ -171,26 +170,20 @@ export default async function VehicleDetailPage({ params }: Props) {
               </span>
             </div>
 
-            {/* Title */}
             <p className="text-sm text-stone-400 tracking-wide mb-1">{specs.brand}</p>
-            <h1 className="text-3xl font-light text-stone-900 mb-1">
-              {specs.model}
-            </h1>
+            <h1 className="text-3xl font-light text-stone-900 mb-1">{specs.model}</h1>
             <p className="text-stone-400 mb-6">{specs.year}</p>
 
-            {/* Price */}
             <p className="text-3xl font-medium text-stone-900 mb-8">
               {formatPrice(vehicle.price, vehicle.currency)}
             </p>
 
-            {/* Short description */}
             {vehicle.short_description && (
               <p className="text-stone-600 leading-relaxed mb-8 border-t border-stone-100 pt-6">
                 {vehicle.short_description}
               </p>
             )}
 
-            {/* Quick specs */}
             <div className="grid grid-cols-2 gap-x-6 gap-y-4 mb-8 border-t border-stone-100 pt-6">
               {[
                 { label: 'Miltal', value: formatMileage(specs.mileage) },
@@ -209,7 +202,6 @@ export default async function VehicleDetailPage({ params }: Props) {
               ))}
             </div>
 
-            {/* CTA buttons */}
             <div className="flex flex-col gap-3">
               <Link
                 href="/contact"
@@ -217,6 +209,7 @@ export default async function VehicleDetailPage({ params }: Props) {
               >
                 Kontakta oss om denna bil
               </Link>
+
               {vehicle.blocket_url && (
                 <a
                   href={vehicle.blocket_url}
@@ -227,6 +220,7 @@ export default async function VehicleDetailPage({ params }: Props) {
                   Visa annons på Blocket ↗
                 </a>
               )}
+
               <a
                 href={`tel:${settings?.phone}`}
                 className="w-full text-center text-stone-500 py-2 text-sm hover:text-stone-900 transition-colors"
@@ -237,7 +231,6 @@ export default async function VehicleDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Full description */}
         {vehicle.full_description && (
           <div className="mt-14 max-w-3xl">
             <h2 className="text-xl font-light text-stone-900 mb-6 pb-4 border-b border-stone-100">
@@ -250,11 +243,10 @@ export default async function VehicleDetailPage({ params }: Props) {
           </div>
         )}
 
-        {/* Related vehicles */}
         {relatedVehicles.length > 0 && (
           <div className="mt-20 pt-12 border-t border-stone-100">
             <h2 className="text-xl font-light text-stone-900 mb-8">
-              Fler {isCollector ? 'samlarsbilar' : 'bilar'} i lager
+              Fler {isCollector ? 'premiumbilar' : 'bilar'} i lager
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {relatedVehicles.map((v) => (
