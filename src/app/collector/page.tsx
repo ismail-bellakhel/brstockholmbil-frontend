@@ -5,7 +5,7 @@ import { VehicleCard } from '@/components/vehicles/VehicleCard'
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: 'Samlarsektionen — Klassiska och sällsynta bilar',
+  title: 'Premiumbilar — Klassiska och sällsynta bilar',
   description: 'Noggrant utvalda samlarbilar, klassiker och specialbilar. Varje bil har en historia värd att berätta.',
 }
 
@@ -23,7 +23,7 @@ export default async function CollectorPage({ searchParams }: PageProps) {
       {/* Hero band — dark, editorial */}
       <div className="bg-stone-950 py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <p className="text-[11px] tracking-widest uppercase text-stone-500 mb-3">Samlarsektionen</p>
+          <p className="text-[11px] tracking-widest uppercase text-stone-500 mb-3">Premiumbilar</p>
           <h1 className="text-4xl sm:text-5xl font-light text-white mb-5 max-w-2xl leading-tight">
             Bilar med historia
           </h1>

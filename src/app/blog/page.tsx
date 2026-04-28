@@ -25,7 +25,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
         <p className="text-[11px] tracking-widest uppercase text-stone-400 mb-2">Nyheter & artiklar</p>
         <h1 className="text-3xl font-light text-stone-900 mb-3">Från oss</h1>
         <p className="text-stone-500">
-          Guider, marknadsanalyser och reportage om bilar och samlarsektionen.
+          Guider, marknadsanalyser och reportage om bilar och Premiumbilar.
         </p>
       </div>
 

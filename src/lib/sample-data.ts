@@ -199,7 +199,7 @@ export const sampleArticles = [
     title: 'Fem Volvo-klassiker du bör köpa innan de blir för dyra',
     excerpt:
       'P1800, 240 GLT, 480 och fler — några Volvos som fortfarande kan köpas till rimliga priser men som sannolikt fortsätter stiga i värde.',
-    category: 'Samlarsektionen',
+    category: 'Premiumbilar',
     publishedAt: '2024-09-15',
   },
 ]

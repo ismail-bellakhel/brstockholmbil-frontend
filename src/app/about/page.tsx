@@ -38,7 +38,7 @@ export default function AboutPage() {
           </p>
           <p>
             Hos oss hittar du pålitliga vardagsbilar för familjen och pendlingen, liksom
-            mer exklusiva alternativ och klassiker i samlarsektionen.
+            mer exklusiva alternativ och klassiker i Premiumbilar.
           </p>
         </div>
 

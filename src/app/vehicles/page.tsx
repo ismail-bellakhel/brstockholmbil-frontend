@@ -46,7 +46,7 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
       <div className="flex gap-1 mb-8 border border-stone-200 w-fit">
         {[
           { value: 'regular', label: 'Begagnade bilar' },
-          { value: 'collector', label: 'Samlarsektionen' },
+          { value: 'collector', label: 'Premiumbilar' },
         ].map(({ value, label }) => (
           <a
             key={value}

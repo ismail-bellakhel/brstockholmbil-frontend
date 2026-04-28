@@ -24,7 +24,7 @@ export function SiteFooter({ settings }: { settings: SiteSettings | null }) {
             <nav className="flex flex-col gap-2.5">
               {[
                 { href: '/vehicles', label: 'Bilar till salu' },
-                { href: '/collector', label: 'Samlarsektionen' },
+                { href: '/collector', label: 'Premiumbilar' },
                 { href: '/blog', label: 'Nyheter' },
                 { href: '/about', label: 'Om oss' },
                 { href: '/contact', label: 'Kontakt' },

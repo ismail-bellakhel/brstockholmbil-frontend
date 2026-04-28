@@ -174,5 +174,5 @@ const makeArticle = (
 export const MOCK_ARTICLES: Article[] = [
   makeArticle(1, 'kopa-begagnad-bil-guide', 'Guide: Vad bör du kontrollera när du köper en begagnad bil?', 'En grundlig checklista för dig som köper begagnad bil — från karosseri och motor till servicehistorik och besiktningsprotokoll.', 'Köpguide', 23),
   makeArticle(2, 'porsche-911-investering-2024', 'Porsche 911 som investering: vilka årsmodeller håller värdet bäst?', 'Luftkylda 911:or har stigit dramatiskt i värde de senaste åren. Vi analyserar vilka modeller som historiskt haft den starkaste värdeutvecklingen.', 'Analys', 34),
-  makeArticle(3, 'volvo-klassiker-att-kopa-nu', 'Fem Volvo-klassiker du bör köpa innan de blir för dyra', 'P1800, 240 GLT, 480 och fler — modeller som fortfarande köps till rimliga priser men sannolikt stiger i värde.', 'Samlarsektionen', 55),
+  makeArticle(3, 'volvo-klassiker-att-kopa-nu', 'Fem Volvo-klassiker du bör köpa innan de blir för dyra', 'P1800, 240 GLT, 480 och fler — modeller som fortfarande köps till rimliga priser men sannolikt stiger i värde.', 'Premiumbilar', 55),
 ]
