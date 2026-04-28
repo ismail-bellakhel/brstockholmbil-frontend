@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { getVehicleBySlug, getVehicleSlugs, getSiteSettings, getVehicles } from '@/lib/api/wordpress'
 import { buildVehicleMetadata, vehicleJsonLd, formatPrice, formatMileage } from '@/lib/utils/metadata'
 import { VehicleCard } from '@/components/vehicles/VehicleCard'
+import { VehicleGallery } from '@/components/vehicles/VehicleGallery'
 
 export const dynamic = 'force-dynamic'
 
@@ -84,7 +85,6 @@ export default async function VehicleDetailPage({ params }: Props) {
 
   const specs = vehicle.specs
   const isCollector = vehicle.category === 'collector'
-  const heroUrl = vehicle.hero_image?.sizes?.large || vehicle.hero_image?.url || ''
 
   return (
     <>
@@ -106,52 +106,7 @@ export default async function VehicleDetailPage({ params }: Props) {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
           <div className="lg:col-span-7">
-            <div className="relative aspect-[16/10] bg-stone-100 overflow-hidden mb-3">
-              {heroUrl ? (
-                <img
-                  src={heroUrl}
-                  alt={`${specs.brand} ${specs.model} ${specs.year}`}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-stone-200 flex items-center justify-center">
-                  <span className="text-stone-400 text-sm">Ingen bild</span>
-                </div>
-              )}
-
-              {vehicle.status !== 'available' && (
-                <div className="absolute inset-0 bg-stone-900/40 flex items-center justify-center">
-                  <span className="bg-white text-stone-900 text-sm tracking-widest uppercase px-6 py-2">
-                    {STATUS_LABELS[vehicle.status]}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {vehicle.gallery_images.length > 0 && (
-              <div className="grid grid-cols-5 gap-2">
-                {vehicle.gallery_images.slice(0, 5).map((img, i) => {
-                  const imageUrl = img.sizes?.thumbnail || img.sizes?.medium || img.url
-
-                  return (
-                    <div key={i} className="relative aspect-square bg-stone-100 overflow-hidden">
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={`${specs.brand} ${specs.model} — bild ${i + 2}`}
-                          className="w-full h-full object-cover hover:opacity-80 transition-opacity cursor-pointer"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-stone-200 flex items-center justify-center">
-                          <span className="text-stone-400 text-xs">Ingen bild</span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+            <VehicleGallery vehicle={vehicle} />
           </div>
 
           <div className="lg:col-span-5">
@@ -161,11 +116,13 @@ export default async function VehicleDetailPage({ params }: Props) {
                   Premiumbil
                 </span>
               )}
-              <span className={`text-[10px] tracking-widest uppercase px-2.5 py-1 border ${
-                vehicle.status === 'available'
-                  ? 'border-stone-200 text-stone-400'
-                  : 'border-amber-200 text-amber-700 bg-amber-50'
-              }`}>
+              <span
+                className={`text-[10px] tracking-widest uppercase px-2.5 py-1 border ${
+                  vehicle.status === 'available'
+                    ? 'border-stone-200 text-stone-400'
+                    : 'border-amber-200 text-amber-700 bg-amber-50'
+                }`}
+              >
                 {STATUS_LABELS[vehicle.status]}
               </span>
             </div>
@@ -194,12 +151,14 @@ export default async function VehicleDetailPage({ params }: Props) {
                 { label: 'Effekt', value: `${specs.horsepower} hk` },
                 { label: 'Exteriörfärg', value: specs.exterior_color },
                 { label: 'Interiörfärg', value: specs.interior_color },
-              ].filter(({ value }) => value && value !== '0 hk').map(({ label, value }) => (
-                <div key={label}>
-                  <p className="text-[10px] tracking-wider uppercase text-stone-400 mb-0.5">{label}</p>
-                  <p className="text-sm font-medium text-stone-900">{value}</p>
-                </div>
-              ))}
+              ]
+                .filter(({ value }) => value && value !== '0 hk')
+                .map(({ label, value }) => (
+                  <div key={label}>
+                    <p className="text-[10px] tracking-wider uppercase text-stone-400 mb-0.5">{label}</p>
+                    <p className="text-sm font-medium text-stone-900">{value}</p>
+                  </div>
+                ))}
             </div>
 
             <div className="flex flex-col gap-3">
