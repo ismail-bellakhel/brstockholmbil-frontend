@@ -54,7 +54,7 @@ export default async function HomePage() {
                 {settings?.hero_cta_label ?? 'Se alla bilar'}
               </Link>
               <Link
-                href="/collector"
+                href="#premium"
                 className="inline-flex items-center gap-2 border border-white text-white px-7 py-3.5 text-sm tracking-wide hover:bg-white hover:text-stone-900 transition-colors"
               >
                 Premiumbilar
@@ -86,14 +86,14 @@ export default async function HomePage() {
 
       {/* ── Collector spotlight ────────────────────────────────────────────────── */}
       {collectorVehicles.length > 0 && (
-        <section className="bg-stone-950 py-20">
+        <section id="premium" className="bg-stone-950 py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-10">
               <div>
                 <p className="text-[11px] tracking-widest uppercase text-stone-500 mb-2">Premiumbilar</p>
                 <h2 className="text-2xl font-light text-white">Sällsynta och klassiska bilar</h2>
               </div>
-              <Link href="/collector" className="text-sm text-stone-500 hover:text-stone-300 transition-colors">
+              <Link href="#premium" className="text-sm text-stone-500 hover:text-stone-300 transition-colors">
                 Se Premiumbilar →
               </Link>
             </div>
