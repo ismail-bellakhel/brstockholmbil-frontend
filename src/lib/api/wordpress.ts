@@ -284,7 +284,16 @@ export async function getFeaturedVehicles(category?: string): Promise<Vehicle[]>
     if (!res) return fallback
 
     const data = await res.json()
-    return Array.isArray(data) ? data.map(mapVehicle) : fallback
+    if (!Array.isArray(data)) return fallback
+
+const vehicles = await Promise.all(data.map(mapVehicle))
+
+// HARD FILTER (fixes WordPress ignoring filters)
+return vehicles.filter((v) => {
+  if (category === 'collector') return v.category === 'collector'
+  if (category === 'regular') return v.category === 'regular'
+  return true
+})
   } catch {
     return fallback
   }
