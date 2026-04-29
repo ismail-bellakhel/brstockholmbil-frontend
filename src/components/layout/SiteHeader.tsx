@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const NAV_LINKS = [
   { href: '/vehicles', label: 'Bilar till salu' },
@@ -17,52 +17,53 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    // Set initial state in case page loads mid-scroll
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40)
+    }
+
+    handleScroll()
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-50 transition-all duration-300 border-b ${
         scrolled
-          ? 'bg-white shadow-sm border-b border-stone-200'
-          : 'bg-white/70 backdrop-blur-md border-b border-white/30'
+          ? 'bg-white/95 backdrop-blur border-stone-200 shadow-sm'
+          : 'bg-white/60 backdrop-blur-md border-white/30'
       }`}
     >
-      {/* Fixed-height row — logo never pushes this taller */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
-
-          {/* Logo — overflow:visible so the scaled image grows outside the row without pushing it */}
+        <div className="relative flex items-center justify-between h-16 sm:h-20">
+          
+          {/* LOGO */}
           <Link
             href="/"
-            className="relative flex items-center shrink-0 overflow-visible"
+            className="flex items-center shrink-0"
             aria-label={dealershipName ?? 'BR Stockholm Bil'}
           >
             <img
               src="/logo.png"
               alt={dealershipName ?? 'BR Stockholm Bil'}
-              className={`w-auto transition-all duration-300 ease-out origin-left ${
-                scrolled
-                  ? 'h-9 sm:h-11'
-                  : 'h-12 sm:h-16'
+              className={`w-auto transition-all duration-300 ${
+                scrolled ? 'h-10 sm:h-12' : 'h-12 sm:h-16'
               }`}
             />
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8" aria-label="Huvudnavigation">
+          {/* DESKTOP NAV */}
+          <nav className="hidden md:flex items-center gap-10" aria-label="Huvudnavigation">
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
-                className={`text-sm tracking-wide transition-colors ${
+                className={`text-base font-medium tracking-wide transition-colors ${
                   pathname?.startsWith(href)
                     ? 'text-stone-900'
-                    : 'text-stone-500 hover:text-stone-900'
+                    : scrolled
+                    ? 'text-stone-600 hover:text-stone-900'
+                    : 'text-stone-800 hover:text-black'
                 }`}
               >
                 {label}
@@ -70,10 +71,10 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
             ))}
           </nav>
 
-          {/* Mobile menu button */}
+          {/* MOBILE BUTTON */}
           <button
             type="button"
-            className="md:hidden inline-flex items-center justify-center h-10 w-10 rounded-full border border-stone-200 text-stone-700 hover:bg-stone-50 transition-colors"
+            className="md:hidden inline-flex items-center justify-center h-10 w-10 rounded-full border border-stone-300 bg-white/70 text-stone-800 hover:bg-white"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? 'Stäng meny' : 'Öppna meny'}
             aria-expanded={mobileOpen}
@@ -91,21 +92,18 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
         </div>
       </div>
 
-      {/* Mobile nav drawer */}
+      {/* MOBILE MENU */}
       {mobileOpen && (
         <div className="md:hidden border-t border-stone-200 bg-white shadow-sm">
-          <nav
-            className="max-w-7xl mx-auto px-4 py-3 flex flex-col"
-            aria-label="Mobilnavigation"
-          >
+          <nav className="max-w-7xl mx-auto px-4 py-3 flex flex-col">
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
-                className={`py-3 text-base tracking-wide border-b border-stone-100 last:border-b-0 ${
+                className={`py-3 text-base font-medium tracking-wide border-b border-stone-100 last:border-b-0 ${
                   pathname?.startsWith(href)
-                    ? 'text-stone-900 font-medium'
-                    : 'text-stone-500'
+                    ? 'text-stone-900'
+                    : 'text-stone-600'
                 }`}
                 onClick={() => setMobileOpen(false)}
               >
