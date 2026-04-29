@@ -35,7 +35,7 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className={`relative flex items-center transition-all duration-500 ${
-            scrolled ? 'h-14 sm:h-16' : 'h-16 sm:h-20'
+            scrolled ? 'h-12 sm:h-14' : 'h-16 sm:h-20'
           }`}
         >
           <Link
