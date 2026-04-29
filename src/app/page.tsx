@@ -38,6 +38,7 @@ export default async function HomePage() {
     className="absolute inset-0 w-full h-full object-cover opacity-0 animate-fade delay-10"
   />
 </div>
+<div className="absolute inset-0 bg-black/40"></div>
         
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
