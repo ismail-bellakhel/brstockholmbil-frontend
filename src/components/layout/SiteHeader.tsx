@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const NAV_LINKS = [
   { href: '/vehicles', label: 'Bilar till salu' },
@@ -17,31 +17,31 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40)
-
-    handleScroll()
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    const onScroll = () => setScrolled(window.scrollY > 32)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
     <header
-      className={`sticky top-0 z-50 border-b transition-all duration-500 ${
+      className={`sticky top-0 z-50 transition-all duration-500 ${
         scrolled
-          ? 'bg-white/90 backdrop-blur-xl border-stone-200 shadow-sm'
-          : 'bg-white/35 backdrop-blur-2xl border-white/20'
+          ? 'bg-white/90 backdrop-blur-sm shadow-sm border-b border-stone-200/80'
+          : 'bg-white/30 backdrop-blur-lg border-b border-white/20'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Controlled-height row — position:relative so absolute nav is anchored here */}
         <div
-          className={`relative flex items-center transition-all duration-500 ${
+          className={`relative flex items-center justify-between transition-all duration-500 ${
             scrolled ? 'h-14 sm:h-16' : 'h-16 sm:h-20'
           }`}
         >
           {/* Logo */}
           <Link
             href="/"
-            className="absolute left-0 flex items-center shrink-0"
+            className="flex items-center shrink-0 z-10"
             aria-label={dealershipName ?? 'BR Stockholm Bil'}
           >
             <img
@@ -49,18 +49,25 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
               alt={dealershipName ?? 'BR Stockholm Bil'}
               className={`w-auto transition-all duration-500 ease-out ${
                 scrolled
-                  ? 'h-9 sm:h-10 scale-95'
-                  : 'h-12 sm:h-16 scale-105'
+                  ? 'h-8 sm:h-9 scale-95'
+                  : 'h-11 sm:h-13 scale-105'
               }`}
             />
           </Link>
 
-          {/* Desktop nav */}
+          {/*
+            Desktop nav — two positions:
+              top:      static in normal flow, aligned right (justify-between pushes it right)
+              scrolled: absolute, centered horizontally in the header row
+
+            Switching between these via conditional classes.
+            Both states keep items-center so vertical alignment tracks the row height.
+          */}
           <nav
-            className={`hidden md:flex items-center transition-all duration-500 ease-out ${
+            className={`hidden md:flex items-center gap-7 transition-all duration-500 ${
               scrolled
-                ? 'absolute left-1/2 -translate-x-1/2 gap-8'
-                : 'ml-auto gap-10'
+                ? 'absolute left-1/2 -translate-x-1/2'
+                : 'static translate-x-0'
             }`}
             aria-label="Huvudnavigation"
           >
@@ -68,14 +75,12 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
               <Link
                 key={href}
                 href={href}
-                className={`font-medium tracking-wide transition-all duration-500 ease-out ${
-                  scrolled ? 'text-sm scale-95' : 'text-base scale-100'
+                className={`font-medium tracking-wide transition-all duration-500 whitespace-nowrap ${
+                  scrolled ? 'text-sm' : 'text-base'
                 } ${
                   pathname?.startsWith(href)
                     ? 'text-stone-900'
-                    : scrolled
-                      ? 'text-stone-600 hover:text-stone-900'
-                      : 'text-stone-800 hover:text-black'
+                    : 'text-stone-500 hover:text-stone-900'
                 }`}
               >
                 {label}
@@ -83,20 +88,20 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
             ))}
           </nav>
 
-          {/* Mobile button */}
+          {/* Mobile menu button — always right-aligned, z-10 so it stays above abs nav */}
           <button
             type="button"
-            className="ml-auto md:hidden inline-flex items-center justify-center h-10 w-10 rounded-full border border-stone-300 bg-white/70 text-stone-800 hover:bg-white"
+            className="md:hidden inline-flex items-center justify-center h-9 w-9 rounded-full border border-stone-300/60 text-stone-700 hover:bg-white/60 transition-colors z-10"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? 'Stäng meny' : 'Öppna meny'}
             aria-expanded={mobileOpen}
           >
             {mobileOpen ? (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 7h16M4 12h16M4 17h16" />
               </svg>
             )}
@@ -104,15 +109,21 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
         </div>
       </div>
 
+      {/* Mobile nav drawer */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-stone-200 bg-white/95 backdrop-blur-xl shadow-sm">
-          <nav className="max-w-7xl mx-auto px-4 py-3 flex flex-col">
+        <div className="md:hidden border-t border-stone-200 bg-white shadow-sm">
+          <nav
+            className="max-w-7xl mx-auto px-4 py-2 flex flex-col"
+            aria-label="Mobilnavigation"
+          >
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
-                className={`py-3 text-base font-medium tracking-wide border-b border-stone-100 last:border-b-0 ${
-                  pathname?.startsWith(href) ? 'text-stone-900' : 'text-stone-600'
+                className={`py-3 text-base font-medium tracking-wide border-b border-stone-100 last:border-b-0 transition-colors ${
+                  pathname?.startsWith(href)
+                    ? 'text-stone-900'
+                    : 'text-stone-500'
                 }`}
                 onClick={() => setMobileOpen(false)}
               >
