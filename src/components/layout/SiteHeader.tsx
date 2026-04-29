@@ -17,9 +17,7 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 40)
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 40)
 
     handleScroll()
     window.addEventListener('scroll', handleScroll)
@@ -28,16 +26,18 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 border-b ${
+      className={`sticky top-0 z-50 border-b transition-all duration-300 ${
         scrolled
           ? 'bg-white/95 backdrop-blur border-stone-200 shadow-sm'
           : 'bg-white/60 backdrop-blur-md border-white/30'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center justify-between h-16 sm:h-20">
-          
-          {/* LOGO */}
+        <div
+          className={`relative flex items-center justify-between transition-all duration-300 ${
+            scrolled ? 'h-14 sm:h-16' : 'h-16 sm:h-20'
+          }`}
+        >
           <Link
             href="/"
             className="flex items-center shrink-0"
@@ -47,13 +47,17 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
               src="/logo.png"
               alt={dealershipName ?? 'BR Stockholm Bil'}
               className={`w-auto transition-all duration-300 ${
-                scrolled ? 'h-10 sm:h-12' : 'h-12 sm:h-16'
+                scrolled ? 'h-9 sm:h-10' : 'h-12 sm:h-16'
               }`}
             />
           </Link>
 
-          {/* DESKTOP NAV */}
-          <nav className="hidden md:flex items-center gap-10" aria-label="Huvudnavigation">
+          <nav
+            className={`hidden md:flex items-center transition-all duration-300 ${
+              scrolled ? 'gap-8 translate-y-0' : 'gap-10 translate-y-0'
+            }`}
+            aria-label="Huvudnavigation"
+          >
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
@@ -62,8 +66,8 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
                   pathname?.startsWith(href)
                     ? 'text-stone-900'
                     : scrolled
-                    ? 'text-stone-600 hover:text-stone-900'
-                    : 'text-stone-800 hover:text-black'
+                      ? 'text-stone-600 hover:text-stone-900'
+                      : 'text-stone-800 hover:text-black'
                 }`}
               >
                 {label}
@@ -71,7 +75,6 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
             ))}
           </nav>
 
-          {/* MOBILE BUTTON */}
           <button
             type="button"
             className="md:hidden inline-flex items-center justify-center h-10 w-10 rounded-full border border-stone-300 bg-white/70 text-stone-800 hover:bg-white"
@@ -92,7 +95,6 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
         </div>
       </div>
 
-      {/* MOBILE MENU */}
       {mobileOpen && (
         <div className="md:hidden border-t border-stone-200 bg-white shadow-sm">
           <nav className="max-w-7xl mx-auto px-4 py-3 flex flex-col">
@@ -101,9 +103,7 @@ export function SiteHeader({ dealershipName }: { dealershipName?: string }) {
                 key={href}
                 href={href}
                 className={`py-3 text-base font-medium tracking-wide border-b border-stone-100 last:border-b-0 ${
-                  pathname?.startsWith(href)
-                    ? 'text-stone-900'
-                    : 'text-stone-600'
+                  pathname?.startsWith(href) ? 'text-stone-900' : 'text-stone-600'
                 }`}
                 onClick={() => setMobileOpen(false)}
               >
