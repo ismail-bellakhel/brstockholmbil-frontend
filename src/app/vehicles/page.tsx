@@ -7,8 +7,7 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Bilar till salu',
-  description:
-    'Bläddra bland våra noggrant utvalda begagnade bilar. Transparenta priser och ärlig information.',
+  description: 'Bläddra bland våra noggrant utvalda begagnade bilar. Transparenta priser och ärlig information.',
 }
 
 interface PageProps {
@@ -32,7 +31,7 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
     transmission: sp.transmission as VehicleFilters['transmission'],
   }
 
-  const { items: vehicles, total, total_pages } = await getVehicles(filters, page, 15)
+  const { items: vehicles, total, total_pages } = await getVehicles(filters, page, 12)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
@@ -63,9 +62,9 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
 
       {vehicles.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {vehicles.map((vehicle, i) => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} priority={i < 4} />
+              <VehicleCard key={vehicle.id} vehicle={vehicle} priority={i < 3} />
             ))}
           </div>
 
@@ -90,9 +89,7 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
       ) : (
         <div className="text-center py-20 border border-stone-100">
           <p className="text-stone-400 mb-2">Inga bilar hittades</p>
-          <p className="text-sm text-stone-400">
-            Prova att justera filtren eller kom tillbaka senare.
-          </p>
+          <p className="text-sm text-stone-400">Prova att justera filtren eller kom tillbaka senare.</p>
         </div>
       )}
     </div>
