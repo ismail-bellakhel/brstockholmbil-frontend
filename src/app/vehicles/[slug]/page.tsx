@@ -6,7 +6,7 @@ import { buildVehicleMetadata, vehicleJsonLd, formatPrice, formatMileage } from 
 import { VehicleCard } from '@/components/vehicles/VehicleCard'
 import { VehicleGallery } from '@/components/vehicles/VehicleGallery'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -19,11 +19,14 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
+
   const [vehicle, settings] = await Promise.all([
     getVehicleBySlug(slug),
     getSiteSettings(),
   ])
+
   if (!vehicle) return {}
+
   return buildVehicleMetadata(vehicle, settings)
 }
 
@@ -57,6 +60,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default async function VehicleDetailPage({ params }: Props) {
   const { slug } = await params
+
   const [vehicle, settings] = await Promise.all([
     getVehicleBySlug(slug),
     getSiteSettings(),
@@ -97,7 +101,10 @@ export default async function VehicleDetailPage({ params }: Props) {
         <nav className="flex items-center gap-2 text-xs text-stone-400 mb-8" aria-label="Brödsmulor">
           <Link href="/" className="hover:text-stone-700 transition-colors">Hem</Link>
           <span>/</span>
-          <Link href={isCollector ? '/collector' : '/vehicles'} className="hover:text-stone-700 transition-colors">
+          <Link
+            href={isCollector ? '/collector' : '/vehicles'}
+            className="hover:text-stone-700 transition-colors"
+          >
             {isCollector ? 'Premiumbilar' : 'Bilar till salu'}
           </Link>
           <span>/</span>
@@ -116,6 +123,7 @@ export default async function VehicleDetailPage({ params }: Props) {
                   Premiumbil
                 </span>
               )}
+
               <span
                 className={`text-[10px] tracking-widest uppercase px-2.5 py-1 border ${
                   vehicle.status === 'available'
@@ -155,7 +163,9 @@ export default async function VehicleDetailPage({ params }: Props) {
                 .filter(({ value }) => value && value !== '0 hk')
                 .map(({ label, value }) => (
                   <div key={label}>
-                    <p className="text-[10px] tracking-wider uppercase text-stone-400 mb-0.5">{label}</p>
+                    <p className="text-[10px] tracking-wider uppercase text-stone-400 mb-0.5">
+                      {label}
+                    </p>
                     <p className="text-sm font-medium text-stone-900">{value}</p>
                   </div>
                 ))}
