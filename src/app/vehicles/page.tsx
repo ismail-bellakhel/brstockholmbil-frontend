@@ -23,15 +23,23 @@ interface PageProps {
 export default async function VehiclesPage({ searchParams }: PageProps) {
   const sp = await searchParams
   const page = Number(sp.page ?? 1)
+  const selectedCategory = sp.category as VehicleCategory | undefined
 
   const filters: VehicleFilters = {
-    category: (sp.category as VehicleCategory) ?? 'regular',
+    ...(selectedCategory ? { category: selectedCategory } : {}),
     brand: sp.brand,
     fuel: sp.fuel as VehicleFilters['fuel'],
     transmission: sp.transmission as VehicleFilters['transmission'],
   }
 
   const { items: vehicles, total, total_pages } = await getVehicles(filters, page, 12)
+
+  const pageHref = (p: number) => {
+    const params = new URLSearchParams()
+    if (selectedCategory) params.set('category', selectedCategory)
+    params.set('page', String(p))
+    return `/vehicles?${params.toString()}`
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
@@ -41,16 +49,17 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
         <p className="text-stone-500 mt-2">{total} bilar tillgängliga</p>
       </div>
 
-      <div className="flex gap-1 mb-8 border border-stone-200 w-fit">
+      <div className="flex flex-wrap gap-1 mb-8 border border-stone-200 w-fit">
         {[
-          { value: 'regular', label: 'Begagnade bilar' },
-          { value: 'collector', label: 'Premiumbilar' },
-        ].map(({ value, label }) => (
+          { value: undefined, label: 'Alla bilar', href: '/vehicles' },
+          { value: 'regular', label: 'Begagnade bilar', href: '/vehicles?category=regular' },
+          { value: 'collector', label: 'Premiumbilar', href: '/vehicles?category=collector' },
+        ].map(({ value, label, href }) => (
           <a
-            key={value}
-            href={`/vehicles?category=${value}`}
+            key={label}
+            href={href}
             className={`px-5 py-2.5 text-sm tracking-wide transition-colors ${
-              (filters.category ?? 'regular') === value
+              selectedCategory === value
                 ? 'bg-stone-900 text-white'
                 : 'text-stone-600 hover:text-stone-900 hover:bg-stone-50'
             }`}
@@ -73,7 +82,7 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
               {Array.from({ length: total_pages }, (_, i) => i + 1).map((p) => (
                 <a
                   key={p}
-                  href={`/vehicles?category=${filters.category}&page=${p}`}
+                  href={pageHref(p)}
                   className={`w-10 h-10 flex items-center justify-center text-sm border transition-colors ${
                     p === page
                       ? 'bg-stone-900 text-white border-stone-900'
