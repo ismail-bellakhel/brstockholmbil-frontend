@@ -7,7 +7,8 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Bilar till salu',
-  description: 'Bläddra bland våra noggrant utvalda begagnade bilar. Transparenta priser och ärlig information.',
+  description:
+    'Bläddra bland våra noggrant utvalda begagnade bilar. Transparenta priser och ärlig information.',
 }
 
 interface PageProps {
@@ -31,18 +32,16 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
     transmission: sp.transmission as VehicleFilters['transmission'],
   }
 
-  const { items: vehicles, total, total_pages } = await getVehicles(filters, page, 12)
+  const { items: vehicles, total, total_pages } = await getVehicles(filters, page, 15)
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-      {/* Page header */}
       <div className="mb-10">
         <p className="text-[11px] tracking-widest uppercase text-stone-400 mb-2">Lager</p>
         <h1 className="text-3xl font-light text-stone-900">Bilar till salu</h1>
         <p className="text-stone-500 mt-2">{total} bilar tillgängliga</p>
       </div>
 
-      {/* Category toggle */}
       <div className="flex gap-1 mb-8 border border-stone-200 w-fit">
         {[
           { value: 'regular', label: 'Begagnade bilar' },
@@ -62,28 +61,14 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
         ))}
       </div>
 
-      {/* Filter bar — scaffold for future implementation */}
-      {/*
-        Future: FilterBar component with:
-        - Brand select
-        - Fuel type select
-        - Transmission select
-        - Year range slider
-        - Price range slider
-        Each updates searchParams on change, causing server re-fetch.
-        Keep filters server-side for SEO and clean URLs.
-      */}
-
-      {/* Grid */}
       {vehicles.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {vehicles.map((vehicle, i) => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} priority={i < 3} />
+              <VehicleCard key={vehicle.id} vehicle={vehicle} priority={i < 4} />
             ))}
           </div>
 
-          {/* Pagination */}
           {total_pages > 1 && (
             <nav className="mt-12 flex justify-center gap-2" aria-label="Sidnavigation">
               {Array.from({ length: total_pages }, (_, i) => i + 1).map((p) => (
@@ -105,7 +90,9 @@ export default async function VehiclesPage({ searchParams }: PageProps) {
       ) : (
         <div className="text-center py-20 border border-stone-100">
           <p className="text-stone-400 mb-2">Inga bilar hittades</p>
-          <p className="text-sm text-stone-400">Prova att justera filtren eller kom tillbaka senare.</p>
+          <p className="text-sm text-stone-400">
+            Prova att justera filtren eller kom tillbaka senare.
+          </p>
         </div>
       )}
     </div>
