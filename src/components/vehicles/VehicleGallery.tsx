@@ -9,6 +9,13 @@ export function VehicleGallery({ vehicle }: { vehicle: Vehicle }) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
   const currentImage = images[current]
+  const visibleThumbnails = images.slice(0, 5)
+  const remainingCount = Math.max(images.length - 5, 0)
+
+  function openImage(index: number) {
+    setCurrent(index)
+    setLightboxOpen(true)
+  }
 
   function goNext() {
     setCurrent((prev) => (prev + 1) % images.length)
@@ -41,35 +48,50 @@ export function VehicleGallery({ vehicle }: { vehicle: Vehicle }) {
   return (
     <>
       <div>
-        <div
-          className="relative aspect-[16/10] bg-stone-100 overflow-hidden mb-3 cursor-zoom-in"
+        <button
+          type="button"
+          className="relative block w-full aspect-[16/10] bg-stone-100 overflow-hidden mb-3 cursor-zoom-in"
           onClick={() => setLightboxOpen(true)}
+          aria-label="Öppna bildgalleri"
         >
           <img
             src={currentImage.sizes?.large || currentImage.url}
             alt={`${vehicle.specs.brand} ${vehicle.specs.model}`}
             className="w-full h-full object-cover"
           />
-        </div>
+        </button>
 
         {images.length > 1 && (
           <div className="grid grid-cols-5 gap-2">
-            {images.slice(0, 10).map((img, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setCurrent(i)}
-                className={`relative aspect-square bg-stone-100 overflow-hidden border transition ${
-                  i === current ? 'border-stone-900' : 'border-transparent hover:border-stone-300'
-                }`}
-              >
-                <img
-                  src={img.sizes?.thumbnail || img.sizes?.medium || img.url}
-                  alt={`${vehicle.specs.brand} ${vehicle.specs.model} bild ${i + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
+            {visibleThumbnails.map((img, i) => {
+              const isLastVisible = i === 4 && remainingCount > 0
+
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => openImage(i)}
+                  className={`relative aspect-square bg-stone-100 overflow-hidden border transition ${
+                    i === current ? 'border-stone-900' : 'border-transparent hover:border-stone-300'
+                  }`}
+                  aria-label={`Öppna bild ${i + 1}`}
+                >
+                  <img
+                    src={img.sizes?.thumbnail || img.sizes?.medium || img.url}
+                    alt={`${vehicle.specs.brand} ${vehicle.specs.model} bild ${i + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+
+                  {isLastVisible && (
+                    <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
+                      <span className="text-white text-sm sm:text-base font-medium tracking-wide">
+                        +{remainingCount} bilder
+                      </span>
+                    </div>
+                  )}
+                </button>
+              )
+            })}
           </div>
         )}
       </div>
