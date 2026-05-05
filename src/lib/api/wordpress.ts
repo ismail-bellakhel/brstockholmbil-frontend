@@ -23,6 +23,7 @@ const WP_API = `${WP_BASE_URL}/wp-json/wp/v2`
 const WP_ACF_API = `${WP_BASE_URL}/wp-json/acf/v3`
 
 const FETCH_TIMEOUT_MS = 5000
+const DETAIL_GALLERY_LIMIT = 5
 
 function isWpConfigured(): boolean {
   if (!WP_BASE_URL) return false
@@ -106,6 +107,38 @@ async function getMediaById(id: number): Promise<WPImage | null> {
   }
 }
 
+async function getMediaByIds(ids: number[]): Promise<WPImage[]> {
+  const uniqueIds = [...new Set(ids.filter(Boolean))]
+
+  if (uniqueIds.length === 0) return []
+
+  const params = new URLSearchParams({
+    include: uniqueIds.join(','),
+    per_page: String(uniqueIds.length),
+  })
+
+  const res = await safeFetch(`${WP_API}/media?${params}`, {
+    next: { revalidate: 3600 },
+  } as RequestInit)
+
+  if (!res) return []
+
+  try {
+    const data = await res.json()
+    if (!Array.isArray(data)) return []
+
+    const images = data
+      .map((item) => normaliseImage(item as Record<string, unknown>))
+      .filter((image): image is WPImage => image !== null)
+
+    return uniqueIds
+      .map((id) => images.find((image) => image.id === id))
+      .filter((image): image is WPImage => image !== undefined)
+  } catch {
+    return []
+  }
+}
+
 async function resolveImage(field: unknown): Promise<WPImage | null> {
   if (!field) return null
 
@@ -120,17 +153,32 @@ async function resolveImage(field: unknown): Promise<WPImage | null> {
   return null
 }
 
+async function resolveGalleryPreview(field: unknown): Promise<WPImage[]> {
+  if (!Array.isArray(field)) return []
+
+  const firstItems = field.slice(0, DETAIL_GALLERY_LIMIT)
+
+  const numberIds = firstItems.filter((item): item is number => typeof item === 'number')
+  const objectImages = firstItems
+    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+    .map((item) => normaliseImage(item))
+    .filter((image): image is WPImage => image !== null)
+
+  const fetchedImages = await getMediaByIds(numberIds)
+
+  return [...fetchedImages, ...objectImages]
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function mapVehicle(raw: any, includeGallery = false): Promise<Vehicle> {
   const acf = raw.acf ?? {}
 
-  const heroImage = await resolveImage(acf.hero_image)
-
-  // SPEED FIX:
-  // Gallery media is heavy because WordPress returns gallery as image IDs.
-  // Fetching each gallery image blocks the Visa bil page.
-  // For now we load only the hero image so the page opens fast.
-  const galleryImages: WPImage[] = []
+  const [heroImage, galleryImages] = await Promise.all([
+    resolveImage(acf.hero_image),
+    includeGallery
+      ? resolveGalleryPreview(acf.gallery ?? acf.gallery_images ?? [])
+      : Promise.resolve([]),
+  ])
 
   return {
     id: raw.id,
@@ -183,7 +231,6 @@ function mapArticle(raw: any): Article {
     title: raw.title?.rendered ?? '',
     excerpt: raw.excerpt?.rendered?.replace(/<[^>]+>/g, '') ?? '',
     content: raw.content?.rendered ?? '',
-
     featured_image: normaliseImage(raw._embedded?.['wp:featuredmedia']?.[0] ?? null),
 
     categories: (raw._embedded?.['wp:term']?.[0] ?? []).map(
@@ -361,7 +408,7 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
   try {
     const data = await wpFetch<unknown[]>(`/vehicle?slug=${slug}`, 300)
     if (!Array.isArray(data) || data.length === 0) return null
-    return await mapVehicle(data[0], false)
+    return await mapVehicle(data[0], true)
   } catch {
     return null
   }
@@ -369,9 +416,7 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
 
 export async function getVehicleSlugs(): Promise<string[]> {
   if (!isWpConfigured()) {
-    return [...MOCK_REGULAR_VEHICLES, ...MOCK_COLLECTOR_VEHICLES].map(
-      (v) => v.slug
-    )
+    return [...MOCK_REGULAR_VEHICLES, ...MOCK_COLLECTOR_VEHICLES].map((v) => v.slug)
   }
 
   try {
