@@ -16,13 +16,13 @@ const STATUS_LABELS: Record<Vehicle['status'], string> = {
 
 const STATUS_STYLES: Record<Vehicle['status'], string> = {
   available: '',
-  sold: 'bg-stone-100 text-stone-500',
-  reserved: 'bg-amber-50 text-amber-700',
-  incoming: 'bg-sky-50 text-sky-700',
+  sold: 'bg-white/70 text-stone-500 border border-white/50 backdrop-blur-md',
+  reserved: 'bg-amber-50/80 text-amber-700 border border-amber-100/80 backdrop-blur-md',
+  incoming: 'bg-sky-50/80 text-sky-700 border border-sky-100/80 backdrop-blur-md',
 }
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
-  const { specs, price, currency, status, category, blocket_url, show_internal_detail_page } = vehicle
+  const { specs, price, currency, status, category, show_internal_detail_page } = vehicle
   const statusLabel = STATUS_LABELS[status]
   const isSold = status === 'sold'
   const imageUrl = vehicle.hero_image?.sizes?.large || vehicle.hero_image?.url || ''
@@ -34,7 +34,9 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
           <img
             src={imageUrl}
             alt={`${specs.brand} ${specs.model} ${specs.year}`}
-            className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02] ${isSold ? 'grayscale' : ''}`}
+            className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] ${
+              isSold ? 'grayscale' : ''
+            }`}
             loading="lazy"
           />
         ) : (
@@ -44,20 +46,22 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
         )}
 
         {category === 'collector' && (
-          <span className="absolute top-3 left-3 bg-stone-900 text-white text-[10px] tracking-widest uppercase px-2.5 py-1">
+          <span className="absolute top-3 left-3 bg-black/70 backdrop-blur-md border border-white/10 text-white text-[10px] tracking-widest uppercase px-2.5 py-1">
             Premiumbil
           </span>
         )}
 
         {statusLabel && (
-          <span className={`absolute top-3 right-3 text-[10px] tracking-widest uppercase px-2.5 py-1 ${STATUS_STYLES[status]}`}>
+          <span
+            className={`absolute top-3 right-3 text-[10px] tracking-widest uppercase px-2.5 py-1 ${STATUS_STYLES[status]}`}
+          >
             {statusLabel}
           </span>
         )}
       </div>
 
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-2 mb-3">
+      <div className="p-5 bg-white/75 backdrop-blur-sm">
+        <div className="flex items-start justify-between gap-3 mb-3">
           <div>
             <p className="text-[11px] tracking-widest uppercase text-stone-400 mb-0.5">
               {specs.brand}
@@ -66,6 +70,7 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
               {specs.model} · {specs.year}
             </h3>
           </div>
+
           <p className="text-right shrink-0 font-medium text-stone-900">
             {formatPrice(price, currency)}
           </p>
@@ -77,14 +82,11 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
           <span className="capitalize">{specs.transmission}</span>
         </div>
 
-        <div className="flex gap-2">
-          {show_internal_detail_page && (
-            <span className="flex-1 text-center text-xs tracking-wide border border-stone-900 px-3 py-2 text-stone-900 group-hover:bg-stone-900 group-hover:text-white transition-colors duration-200 cursor-pointer">
-              Visa bil
-            </span>
-          )}
-        <div></div>
-        </div>
+        {show_internal_detail_page && (
+          <span className="block w-full text-center text-xs tracking-wide border border-white/40 bg-white/25 backdrop-blur-md px-3 py-2.5 text-stone-900 shadow-sm transition-all duration-200 cursor-pointer group-hover:bg-stone-900/90 group-hover:text-white group-hover:border-stone-900">
+            Visa bil
+          </span>
+        )}
       </div>
     </>
   )
@@ -93,12 +95,16 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
     return (
       <Link
         href={`/vehicles/${vehicle.slug}`}
-        className="group block border border-stone-200 hover:border-stone-400 transition-colors duration-300 bg-white"
+        className="group block overflow-hidden border border-white/40 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_14px_40px_rgba(0,0,0,0.10)] hover:border-stone-300/70 transition-all duration-300"
       >
         {cardContent}
       </Link>
     )
   }
 
-  return <div className="border border-stone-200 bg-white">{cardContent}</div>
+  return (
+    <div className="overflow-hidden border border-white/40 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+      {cardContent}
+    </div>
+  )
 }
