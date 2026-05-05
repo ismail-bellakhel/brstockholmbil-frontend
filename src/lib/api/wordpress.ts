@@ -22,13 +22,13 @@ const WP_BASE_URL = process.env.NEXT_PUBLIC_WP_URL ?? ''
 const WP_API = `${WP_BASE_URL}/wp-json/wp/v2`
 const WP_ACF_API = `${WP_BASE_URL}/wp-json/acf/v3`
 
+const FETCH_TIMEOUT_MS = 5000
+
 function isWpConfigured(): boolean {
   if (!WP_BASE_URL) return false
   if (WP_BASE_URL.includes('yourdomain') || WP_BASE_URL.includes('example')) return false
   return true
 }
-
-const FETCH_TIMEOUT_MS = 5000
 
 async function safeFetch(url: string, options: RequestInit = {}): Promise<Response | null> {
   if (!isWpConfigured()) return null
@@ -39,6 +39,7 @@ async function safeFetch(url: string, options: RequestInit = {}): Promise<Respon
   try {
     const res = await fetch(url, { ...options, signal: controller.signal })
     clearTimeout(timer)
+
     if (!res.ok) return null
     return res
   } catch {
@@ -47,7 +48,7 @@ async function safeFetch(url: string, options: RequestInit = {}): Promise<Respon
   }
 }
 
-async function wpFetch<T>(path: string, revalidate = 60): Promise<T | null> {
+async function wpFetch<T>(path: string, revalidate = 300): Promise<T | null> {
   const res = await safeFetch(`${WP_API}${path}`, {
     next: { revalidate },
   } as RequestInit)
@@ -123,17 +124,16 @@ async function resolveGallery(field: unknown): Promise<WPImage[]> {
   if (!Array.isArray(field)) return []
 
   const images = await Promise.all(field.map((item) => resolveImage(item)))
-
   return images.filter((image): image is WPImage => image !== null)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function mapVehicle(raw: any): Promise<Vehicle> {
+async function mapVehicle(raw: any, includeGallery = true): Promise<Vehicle> {
   const acf = raw.acf ?? {}
 
   const [heroImage, galleryImages] = await Promise.all([
     resolveImage(acf.hero_image),
-    resolveGallery(acf.gallery ?? acf.gallery_images ?? []),
+    includeGallery ? resolveGallery(acf.gallery ?? acf.gallery_images ?? []) : Promise.resolve([]),
   ])
 
   return {
@@ -263,7 +263,11 @@ export async function getVehicles(
   perPage = 24
 ): Promise<PaginatedResponse<Vehicle>> {
   const mockItems =
-    filters.category === 'collector' ? MOCK_COLLECTOR_VEHICLES : MOCK_REGULAR_VEHICLES
+    filters.category === 'collector'
+      ? MOCK_COLLECTOR_VEHICLES
+      : filters.category === 'regular'
+        ? MOCK_REGULAR_VEHICLES
+        : [...MOCK_REGULAR_VEHICLES, ...MOCK_COLLECTOR_VEHICLES]
 
   const fallback: PaginatedResponse<Vehicle> = {
     items: mockItems,
@@ -279,12 +283,11 @@ export async function getVehicles(
     const params = new URLSearchParams({
       per_page: String(perPage),
       page: String(page),
-      _embed: '1',
       status: 'publish',
     })
 
     const res = await safeFetch(`${WP_API}/vehicle?${params}`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 300 },
     } as RequestInit)
 
     if (!res) return fallback
@@ -293,7 +296,9 @@ export async function getVehicles(
     const totalPages = Number(res.headers.get('X-WP-TotalPages') ?? 1)
     const data = await res.json()
 
-    const vehicles = Array.isArray(data) ? await Promise.all(data.map(mapVehicle)) : []
+    const vehicles = Array.isArray(data)
+      ? await Promise.all(data.map((item) => mapVehicle(item, false)))
+      : []
 
     const filtered = filters.category
       ? vehicles.filter((vehicle) => vehicle.category === filters.category)
@@ -301,10 +306,10 @@ export async function getVehicles(
 
     return {
       items: filtered,
-      total: filtered.length || total,
+      total: filters.category ? filtered.length : total,
       page,
       per_page: perPage,
-      total_pages: totalPages,
+      total_pages: filters.category ? Math.max(1, Math.ceil(filtered.length / perPage)) : totalPages,
     }
   } catch {
     return fallback
@@ -313,19 +318,22 @@ export async function getVehicles(
 
 export async function getFeaturedVehicles(category?: string): Promise<Vehicle[]> {
   const fallback =
-    category === 'collector' ? MOCK_COLLECTOR_VEHICLES : MOCK_REGULAR_VEHICLES
+    category === 'collector'
+      ? MOCK_COLLECTOR_VEHICLES
+      : category === 'regular'
+        ? MOCK_REGULAR_VEHICLES
+        : [...MOCK_REGULAR_VEHICLES, ...MOCK_COLLECTOR_VEHICLES]
 
   if (!isWpConfigured()) return fallback
 
   try {
     const params = new URLSearchParams({
-      per_page: '20',
-      _embed: '1',
+      per_page: '12',
       status: 'publish',
     })
 
     const res = await safeFetch(`${WP_API}/vehicle?${params}`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 300 },
     } as RequestInit)
 
     if (!res) return fallback
@@ -333,7 +341,7 @@ export async function getFeaturedVehicles(category?: string): Promise<Vehicle[]>
     const data = await res.json()
     if (!Array.isArray(data)) return fallback
 
-    const vehicles = await Promise.all(data.map(mapVehicle))
+    const vehicles = await Promise.all(data.map((item) => mapVehicle(item, false)))
 
     const filtered = category
       ? vehicles.filter((vehicle) => vehicle.category === category)
@@ -355,9 +363,9 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
   }
 
   try {
-    const data = await wpFetch<unknown[]>(`/vehicle?slug=${slug}&_embed=1`, 300)
+    const data = await wpFetch<unknown[]>(`/vehicle?slug=${slug}`, 300)
     if (!Array.isArray(data) || data.length === 0) return null
-    return await mapVehicle(data[0])
+    return await mapVehicle(data[0], true)
   } catch {
     return null
   }
@@ -372,7 +380,7 @@ export async function getVehicleSlugs(): Promise<string[]> {
 
   try {
     const data = await wpFetch<Array<{ slug: string }>>(
-      '/vehicle?per_page=100&fields=slug',
+      '/vehicle?per_page=100&_fields=slug',
       3600
     )
 
@@ -409,7 +417,7 @@ export async function getArticles(
     if (categorySlug) params.set('categories', categorySlug)
 
     const res = await safeFetch(`${WP_API}/posts?${params}`, {
-      next: { revalidate: 60 },
+      next: { revalidate: 300 },
     } as RequestInit)
 
     if (!res) return fallback
@@ -451,7 +459,7 @@ export async function getArticleSlugs(): Promise<string[]> {
 
   try {
     const data = await wpFetch<Array<{ slug: string }>>(
-      '/posts?per_page=100&fields=slug',
+      '/posts?per_page=100&_fields=slug',
       3600
     )
 
