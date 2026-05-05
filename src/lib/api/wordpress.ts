@@ -120,21 +120,17 @@ async function resolveImage(field: unknown): Promise<WPImage | null> {
   return null
 }
 
-async function resolveGallery(field: unknown): Promise<WPImage[]> {
-  if (!Array.isArray(field)) return []
-
-  const images = await Promise.all(field.map((item) => resolveImage(item)))
-  return images.filter((image): image is WPImage => image !== null)
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function mapVehicle(raw: any, includeGallery = true): Promise<Vehicle> {
+async function mapVehicle(raw: any, includeGallery = false): Promise<Vehicle> {
   const acf = raw.acf ?? {}
 
-  const [heroImage, galleryImages] = await Promise.all([
-    resolveImage(acf.hero_image),
-    includeGallery ? resolveGallery(acf.gallery ?? acf.gallery_images ?? []) : Promise.resolve([]),
-  ])
+  const heroImage = await resolveImage(acf.hero_image)
+
+  // SPEED FIX:
+  // Gallery media is heavy because WordPress returns gallery as image IDs.
+  // Fetching each gallery image blocks the Visa bil page.
+  // For now we load only the hero image so the page opens fast.
+  const galleryImages: WPImage[] = []
 
   return {
     id: raw.id,
@@ -365,7 +361,7 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
   try {
     const data = await wpFetch<unknown[]>(`/vehicle?slug=${slug}`, 300)
     if (!Array.isArray(data) || data.length === 0) return null
-    return await mapVehicle(data[0], true)
+    return await mapVehicle(data[0], false)
   } catch {
     return null
   }
